@@ -1,7 +1,9 @@
-Library/
-Temp/
+/Library/
+/Temp/
 
 /.vscode/
+
+/Assets/XLua/
 
 *.userprefs
 *.sln

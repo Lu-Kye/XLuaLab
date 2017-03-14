@@ -24,7 +24,7 @@ local transform = gameObject.transform
 CSCallLua.num = 10
 ```
 ```csharp
-// Elapsed milliseconds about 0.045
+// Elapsed milliseconds about 0.005
 // 0B GC
 public void TestGetInt()
 {
@@ -36,7 +36,7 @@ public void TestGetInt()
 CSCallLua.obj = {}
 ```
 ```csharp
-// Elapsed milliseconds about 0.045
+// Elapsed milliseconds about 0.007
 // 0B GC
 public void TestGetObj()
 {
@@ -53,7 +53,7 @@ public class ClassA
     public int a;
 }
 ClassA _testClassA;
-// Elapsed milliseconds about 0.08
+// Elapsed milliseconds about 0.01
 // 112B GC
 public void TestGetClass()
 {
@@ -71,7 +71,7 @@ public struct Struct
 {
     public int a;
 }
-// Elapsed milliseconds about 0.07 
+// Elapsed milliseconds about 0.009 
 // 112B GC
 public void TestGetStruct()
 {
@@ -80,13 +80,36 @@ public void TestGetStruct()
     // 	this.Log(_curMethodInfo, "a:{0}", structA.a);
 }
 ```
+* LuaTable to CSharp Interface (Recommendation)
+```lua
+CSCallLua.interfaceA = {
+    a = 1,
+    A = function() 
+    end,
+}
+```
+```csharp
+[CSharpCallLua]
+public interface IInterfaceA
+{
+    int a { get; set; }
+    void A();
+}
+IInterfaceA _interfaceA;
+// Elapsed milliseconds about 0.007
+// 32B GC
+public void TestGetInterface()
+{
+    _interfaceA = _luaTable.Get<IInterfaceA>("interfaceA");
+}
+```
 * LuaTable to CSharp List
 ```lua
 CSCallLua.listA = { 1 }
 ```
 ```csharp
 List<int> _list;
-// Elapsed milliseconds about 0.03
+// Elapsed milliseconds about 0.012
 // 212B GC
 public void TestGetList()
 {
@@ -99,7 +122,7 @@ CSCallLua.dictA = { a = 1 }
 ```
 ```csharp
 Dictionary<string, int> _dict;
-// Elapsed milliseconds about 0.03
+// Elapsed milliseconds about 0.014
 // 700B GC
 public void TestGetDict()
 {
@@ -107,7 +130,7 @@ public void TestGetDict()
 }
 ```
 
-## Test call lua method with number parameter(struct is similar to number test)
+## Test call lua method with number parameter
 ```lua
 function CSCallLua.TestNumber(num)
 end
@@ -119,7 +142,7 @@ public void InitTestNumber()
 {
     _testNumber = _csCallLuaTable.Get<LuaFunction>("TestNumber");
 }
-// Elapsed milliseconds about 0.03
+// Elapsed milliseconds about 0.003
 // 60B GC
 public void TestNumber()
 {
@@ -136,13 +159,53 @@ public void InitTestNumberOpt()
 {
     _csCallLuaTable.Get("TestNumber", out _testNumberOpt);
 }
-// Elapsed milliseconds about 0.015
+// Elapsed milliseconds about 0.002
 // 0B GC
 public void TestNumberOpt()
 {
     _testNumberOpt(10);
 }
 ```
+
+## Test call lua method with csharp struct parameter
+```lua
+function CSCallLua.TestStruct(struct)
+    -- Log.Debug(tostring(struct.c))
+end
+```
+```csharp
+[LuaCallCSharp(GenFlag.GCOptimize)]
+public struct StructA
+{
+    public int a;
+}
+[LuaCallCSharp(GenFlag.GCOptimize)]
+public struct StructB
+{
+    public StructA b;
+    public double c;
+    public float d;
+}
+[CSharpCallLua]
+public delegate void StructBParamMethod(StructB B);
+StructBParamMethod _testStructOpt;
+StructB _testStructB = new StructB{
+    b = new StructA{ a = 1 },
+    c = 1.1,
+    d = 1.1f,
+};
+public void InitTestStructOpt()
+{
+    _luaTable.Get("TestStruct", out _testStructOpt);
+}
+// Elapsed milliseconds about 0.003
+// 0B GC
+public void TestStructOpt()
+{
+    _testStructOpt(_testStructB);
+}
+```
+
 ## Test call lua method with object parameter
 ```lua
 function CSCallLua.TestObject(obj)
@@ -156,7 +219,7 @@ public void InitTestObject()
 {
     _testObject = _csCallLuaTable.Get<LuaFunction>("TestObject");
 }
-// Elapsed milliseconds about 0.015
+// Elapsed milliseconds about 0.0037
 // 40B GC
 public void TestObject()
 {
@@ -172,10 +235,25 @@ public void InitTestObjectOpt()
 {
     _csCallLuaTable.Get("TestObject", out _testObjectOpt);
 }
-// Elapsed milliseconds about 0.007
+// Elapsed milliseconds about 0.0030
 // 0B GC
 public void TestObjectOpt()
 {
     _testObjectOpt(_obj);
 }
 ```
+
+# Some other features
+* Custom lua loader
+* Configure *CSharpCallLua* by list, like below:
+```csharp
+[CSharpCallLua]
+public static List<Type> CSharpCallLua = new List<Type>()
+{
+    typeof(Action),
+    typeof(Action<bool>),
+    typeof(UnityAction),
+};
+```
+* Lua call csharp function with *out*, *ref*
+* Lua call csharp overload functions

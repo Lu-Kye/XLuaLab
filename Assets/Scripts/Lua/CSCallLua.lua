@@ -1,5 +1,12 @@
 CSCallLua = Class("CSCallLua", {})
 
+CSCallLua.num = 10
+CSCallLua.obj = {}
+CSCallLua.classA = { a = 1 }
+CSCallLua.structA = { a = 1 }
+CSCallLua.listA = { 1 }
+CSCallLua.dictA = { a = 1 }
+
 function CSCallLua.TestNumber(num)
     -- Log.Debug(tostring(num))
 end
@@ -8,21 +15,6 @@ function CSCallLua.TestObject(obj)
     -- Log.Debug(tostring(obj))
 end
 
--- function CSCallLua:ctor()
--- end
--- function CSCallLua:TestAll()
---     Log.Debug("TestAll")
---     self:TestCoroutine()
--- end
--- function CSCallLua:TestCoroutine()
---     -- local util = require 'xlua.util'
---     local co = coroutine.create(function () 
---         print("coroutine start")
-
---         -- Log.Debug("TestCoroutine "..CS.Time.realtimeSinceStartup)
---         -- coroutine.yield(CS.UnityEngine.WaitForSeconds(2))
---         -- Log.Debug("TestCoroutine "..CS.Time.realtimeSinceStartup)
---     end)
---     coroutine.resume(co)
--- end
--- CSCallLua.Instance = CSCallLua.New()
+function CSCallLua.TestStruct(struct)
+    -- Log.Debug(tostring(struct.c))
+end

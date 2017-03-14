@@ -43,6 +43,8 @@ public class XLuaManager : MonoBehaviour
      */
     public void LoadFile(string filepath)
     {
+        // TODO: Cache loaded file when in release mode, and reload every time in debug mode
+
 #if UNITY_EDITOR
         if (this.LoadedLuas.Contains(filepath) == false)
         {

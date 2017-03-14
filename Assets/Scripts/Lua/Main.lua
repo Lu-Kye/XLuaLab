@@ -5,9 +5,10 @@ end
 
 include("Class")
 include("Log")
+include("XLuaTestCase")
 
 function Start()
-    print("Start")
+    Log.Debug("Start")
 end
 
 function Update()
@@ -15,5 +16,5 @@ function Update()
 end
 
 function OnDestroy()
-    print("OnDestroy")
+    Log.Debug("OnDestroy")
 end

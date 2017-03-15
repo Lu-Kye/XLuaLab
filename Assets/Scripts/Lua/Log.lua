@@ -1,16 +1,16 @@
 Log = {}
 
-function Log.Debug(msg)
-    print(msg.."\n"..debug.traceback())
+function Log.Debug(format, ...)
+    print(string.format(format, ...).."\n"..debug.traceback())
 end
 
-function Log.Warn(msg)
-    print("<color=yellow>"..msg.."</color>\n"..debug.traceback())
+function Log.Warn(format, ...)
+    print("<color=yellow>"..string.format(format, ...).."</color>\n"..debug.traceback())
 end
 
-function Log.Error(msg)
-    print("<color=red>"..msg.."</color>\n"..debug.traceback())
+function Log.Error(format, ...)
+    print("<color=red>"..string.format(format, ...).."</color>\n"..debug.traceback())
 
     -- XLua override error, and will throw an exception so log error by printing red log.
-    -- error(msg)
+    -- error(string.format(format, ...))
 end

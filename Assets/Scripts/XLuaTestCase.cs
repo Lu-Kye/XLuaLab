@@ -26,7 +26,7 @@ namespace XLuaExamples
         protected MethodInfo _curMethodInfo;
 
         string[] _testCases;
-		protected virtual string[] TestCases {
+		public virtual string[] TestCases {
             get
             {
                 if (_testCases != null)
@@ -97,6 +97,14 @@ namespace XLuaExamples
             this.Test();
         }
 
+        public uint RepeatTimes = 1;
+        
+        [HideInInspector]
+        public uint CurrentTestTimes = 0;
+
+        [HideInInspector]
+        public float StartTime;        
+
 		protected virtual void Test()
 		{
             for (int i = 0; i < _testMethods.Length; i++)
@@ -110,10 +118,11 @@ namespace XLuaExamples
                 
                 this.CurrentTestCase = _testMethods[i].Name;
 
-                var startTime = Time.realtimeSinceStartup;
-                _testMethods[i].Invoke(this, null);
+                this.StartTime = Time.realtimeSinceStartup;
+                for (this.CurrentTestTimes = 1; this.CurrentTestTimes <= this.RepeatTimes; this.CurrentTestTimes++)
+                    _testMethods[i].Invoke(this, null);
                 if (this.EnableLog)
-                    this.Log(_testMethods[i], "Elapsed milliseconds {0}", (Time.realtimeSinceStartup - startTime) * 1000);
+                    this.Log(_testMethods[i], "Elapsed milliseconds {0}", (Time.realtimeSinceStartup - this.StartTime) * 1000 / this.RepeatTimes);
             }
 		}
 

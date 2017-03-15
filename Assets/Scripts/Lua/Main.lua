@@ -3,6 +3,9 @@ function include(filepath)
     CS.XLuaManager.Instance:LoadFile(filepath) 
 end
 
+Profiler = require("perf.profiler")
+Memory = require("perf.memory")
+
 include("Class")
 include("Log")
 include("XLuaTestCase")

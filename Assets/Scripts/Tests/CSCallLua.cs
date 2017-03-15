@@ -5,16 +5,17 @@ namespace XLuaExamples
 {
 	[LuaCallCSharp]
 	// Elapsed time at first time is more than next times.
+	// Elapsed time is calculated by repeating 100000 times. 
 	public class CSCallLua : XLuaTestCase<CSCallLua> 
 	{
-		// Elapsed milliseconds about 0.045
+		// Elapsed milliseconds about 0.005
 		// 0B GC
 		public void TestGetInt()
 		{
 			var num = _luaTable.Get<int>("num");
 		}
 
-		// Elapsed milliseconds about 0.045
+		// Elapsed milliseconds about 0.007
 		// 32B GC
 		LuaTable _testObj;
 		public void TestGetObj()
@@ -22,12 +23,13 @@ namespace XLuaExamples
 			_testObj = _luaTable.Get<LuaTable>("obj");
 		}
 
+
 		public class ClassA
 		{
 			public int a;
 		}
 		ClassA _testClassA;
-		// Elapsed milliseconds about 0.08
+		// Elapsed milliseconds about 0.01
 		// 112B GC
 		public void TestGetClass()
 		{
@@ -36,11 +38,12 @@ namespace XLuaExamples
 			// 	this.Log(_curMethodInfo, "a:{0}", _testClassA.a);
 		}
 
+
 		public struct Struct
 		{
 			public int a;
 		}
-		// Elapsed milliseconds about 0.07
+		// Elapsed milliseconds about 0.009
 		// 112B GC
 		public void TestGetStruct()
 		{
@@ -49,8 +52,23 @@ namespace XLuaExamples
 			// 	this.Log(_curMethodInfo, "a:{0}", structA.a);
 		}
 
+
+		[CSharpCallLua]
+		public interface IInterfaceA
+		{
+			int a { get; set; }
+			void A();
+		}
+		IInterfaceA _interfaceA;
+		// Elapsed milliseconds about 0.007
+		// 32B GC
+		public void TestGetInterface()
+		{
+			_interfaceA = _luaTable.Get<IInterfaceA>("interfaceA");
+		}
+
 		List<int> _list;
-		// Elapsed milliseconds about 0.03
+		// Elapsed milliseconds about 0.012
 		// 212B GC
 		public void TestGetList()
 		{
@@ -58,7 +76,7 @@ namespace XLuaExamples
 		}
 
 		Dictionary<string, int> _dict;
-		// Elapsed milliseconds about 0.03
+		// Elapsed milliseconds about 0.014
 		// 700B GC
 		public void TestGetDict()
 		{
@@ -70,7 +88,7 @@ namespace XLuaExamples
 		{
 			_testNumber = _luaTable.Get<LuaFunction>("TestNumber");
 		}
-		// Elapsed milliseconds about 0.03
+		// Elapsed milliseconds about 0.003
 		// 60B GC
 		public void TestNumber()
 		{
@@ -85,7 +103,7 @@ namespace XLuaExamples
 		{
 			_luaTable.Get("TestNumber", out _testNumberOpt);
 		}
-		// Elapsed milliseconds about 0.015
+		// Elapsed milliseconds about 0.002
 		// 0B GC
 		public void TestNumberOpt()
 		{
@@ -117,6 +135,8 @@ namespace XLuaExamples
 		{
 			_luaTable.Get("TestStruct", out _testStructOpt);
 		}
+		// Elapsed milliseconds about 0.003
+		// 0B GC
 		public void TestStructOpt()
 		{
 			_testStructOpt(_testStructB);
@@ -129,7 +149,7 @@ namespace XLuaExamples
 		{
 			_testObject = _luaTable.Get<LuaFunction>("TestObject");
 		}
-		// Elapsed milliseconds about 0.015
+		// Elapsed milliseconds about 0.0037
 		// 40B GC
 		public void TestObject()
 		{
@@ -144,7 +164,7 @@ namespace XLuaExamples
 		{
 			_luaTable.Get("TestObject", out _testObjectOpt);
 		}
-		// Elapsed milliseconds about 0.007
+		// Elapsed milliseconds about 0.0030
 		// 0B GC
 		public void TestObjectOpt()
 		{

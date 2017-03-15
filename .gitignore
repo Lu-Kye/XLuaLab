@@ -4,6 +4,7 @@
 /.vscode/
 
 /Assets/XLua/
+/Assets/XLua.meta
 
 *.userprefs
 *.sln

@@ -1,39 +1,35 @@
 using XLua;
+using UnityEngine;
 
 namespace XLuaExamples
 {
     [LuaCallCSharp]
-    public class LuaCallCS : XLuaInstTestCase<LuaCallCS>
+    public class LuaCallCS : XLuaTestCaseForLua<LuaCallCS>
     { 
         protected override string LuaFile { get { return "LuaCallCS"; } }
         
-        [CSharpCallLua]
-        public delegate void NoParamMethod(LuaTable self);
-
-        NoParamMethod _testNumber;
-        public void InitTestNumber()
-        {
-            _luaTable.Get("TestNumber", out _testNumber);
-        }
-        public void TestNumber()
-        {
-            _testNumber(_luaTable);
-        }        
-        public void DoTestNumber(int num)
+        public void TestNumber(int num)
         {
         }
 
-        NoParamMethod _testObject;
-        public void InitTestObject()
+        public void TestObject(object obj)
         {
-            _luaTable.Get("TestObject", out _testObject);
         }
-        public void TestObject()
+
+        public void TestOutRef(ref int a, out int b)
         {
-            _testObject(_luaTable);
+            a = 1;
+            b = 2;
         }
-        public void DoTestObject(object obj)
+
+        public void TestOverload() {}
+        public void OverloadA(int a)
         {
+            // Debug.Log(string.Format("int a = {0}", a));
+        }
+        public void OverloadB(LuaTable a)
+        {
+            // Debug.Log(string.Format("LuaTable a = {0}", a.ToString()));
         }
     }
 }

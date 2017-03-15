@@ -4,6 +4,11 @@ CSCallLua.num = 10
 CSCallLua.obj = {}
 CSCallLua.classA = { a = 1 }
 CSCallLua.structA = { a = 1 }
+CSCallLua.interfaceA = {
+    a = 1,
+    A = function() 
+    end,
+}
 CSCallLua.listA = { 1 }
 CSCallLua.dictA = { a = 1 }
 
@@ -18,3 +23,5 @@ end
 function CSCallLua.TestStruct(struct)
     -- Log.Debug(tostring(struct.c))
 end
+
+

@@ -7,7 +7,6 @@ namespace XLuaExamples
         where T : XLuaTestCaseForLua<T>
     {
         protected LuaFunction _instFunc;
-
         protected LuaFunction _testFunc;
         protected LuaFunction _updateFunc;
 
@@ -59,6 +58,19 @@ namespace XLuaExamples
             }
         }
 
+        public bool ShowMemory = false;
+        protected virtual bool LuaShowMemory
+        {
+            get 
+            {
+                return _luaTable.Get<bool>("showMemory");
+            }
+            set
+            {
+                _luaTable.Set<string, bool>("showMemory", value);
+            }
+        }
+
         protected override void Setup()
         {
             base.Setup();
@@ -76,6 +88,9 @@ namespace XLuaExamples
 
         protected override void Update()
         {
+            if (_luaTable == null)
+                return;
+
             if (this.LuaEnableLog != this.EnableLog)
                 this.LuaEnableLog = this.EnableLog;
 
@@ -87,11 +102,28 @@ namespace XLuaExamples
 
             if (this.LuaUpdatingTest != this.UpdatingTest)
                 this.LuaUpdatingTest = this.UpdatingTest;
+            
+            if (this.LuaShowMemory != this.ShowMemory)
+                this.LuaShowMemory = this.ShowMemory;
         }
 
         protected virtual void LateUpdate()
         {
+            if (this.UpdatingTest == false)
+                return;
+
+            if (_updateFunc == null)
+                return;
+
             _updateFunc.Call(_luaTable);
+        }
+
+        protected override void Unsetup()
+        {
+            _instFunc = null;
+            _testFunc = null;
+            _updateFunc = null;
+            base.Unsetup();
         }
     }
 }

@@ -8,6 +8,8 @@ XLuaTestCase.onlyTestCase = nil
 XLuaTestCase.repeatTimes = 1
 XLuaTestCase.updatingTest = false
 
+XLuaTestCase.showMemory = false
+
 XLuaTestCase.testCases = nil
 XLuaTestCase.currentTestCase = nil
 
@@ -34,6 +36,12 @@ end
 
 function XLuaTestCase:BeginTest()
     self.currentTestCase = nil
+    -- Log.Debug(Memory.snapshot())
+
+    if self.showMemory == true then
+        self.startMemory = Memory.total()
+    end
+
     if self.enableLog == false then
         return
     end
@@ -41,6 +49,14 @@ function XLuaTestCase:BeginTest()
 end
 
 function XLuaTestCase:EndTest()
+    if self.showMemory == true then
+        self.endMemory = Memory.total()
+        if self.currentTestCase ~= nil then
+            Log.Debug(self.name.."::"..self.currentTestCase..": Offset memory %fB", (self.endMemory - self.startMemory) * 1024)
+        end
+    end
+    -- Log.Debug(Memory.snapshot())
+
     if self.enableLog == false then
         return
     end
@@ -49,25 +65,35 @@ end
 
 function XLuaTestCase:Test()
     for i = 0, self.testCases.Length - 1 do
-        self:BeginTest()
-        self.startMemory = Memory.total()
+        local isOnlyTest = self.onlyTestCase ~= nil and self.onlyTestCase ~= ''
+        local isOnlyTestExist = isOnlyTest and self.testCases[i] == self.onlyTestCase
+
+        if isOnlyTest then
+            if isOnlyTestExist then
+                self:BeginTest()
+            end
+        else
+            self:BeginTest()
+        end
+
         for j = 1, self.repeatTimes do
-            if self.onlyTestCase ~= nil and self.onlyTestCase ~= '' then
-                if self.onlyTestCase == self.testCases[i] then
+            if isOnlyTest then
+                if isOnlyTestExist then
                     self:DoTest(i)                    
                 end
             else
                 self:DoTest(i)
             end
         end
-        self.endMemory = Memory.total()
-        if self.currentTestCase ~= nil then
-            Log.Debug(self.name.."::"..self.currentTestCase..": Offset memory %fB", (self.endMemory - self.startMemory) * 1024)
-        end
 
-        self:EndTest()
+        if isOnlyTest then
+            if isOnlyTestExist then
+                self:EndTest()
+            end
+        else
+            self:EndTest()
+        end
     end
-    self:Log("Test", Memory.snapshot())
 end
 
 function XLuaTestCase:DoTest(i)

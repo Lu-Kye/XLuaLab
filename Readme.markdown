@@ -1,21 +1,6 @@
 # Test environment
-Macbook Pro
-
-# Use csharp API in lua
-* New csharp class
-```lua
-local gameObject = CS.UnityEngine.GameObject()
-```
-* Call csharp static method and get static field
-```lua
-CS.UnityEngine.GameObject.Find("GameObject")
-local deltaTime = CS.UnityEngine.Time.deltaTime
-```
-* Call csharp object method ang get field
-```lua
-gameObject:SetActive(false)
-local transform = gameObject.transform
-```
+* Macbook Pro.
+* Elapsed time is calculated by repeating 100000 times. 
 
 # CSharp call lua
 ## Test get luaTable fields
@@ -243,9 +228,124 @@ public void TestObjectOpt()
 }
 ```
 
+# Lua call CSharp
+## Use csharp API in lua
+* New csharp class
+```lua
+local gameObject = CS.UnityEngine.GameObject()
+```
+* Call csharp static method and get static field
+```lua
+CS.UnityEngine.GameObject.Find("GameObject")
+local deltaTime = CS.UnityEngine.Time.deltaTime
+```
+* Call csharp object method ang get field
+```lua
+gameObject:SetActive(false)
+local transform = gameObject.transform
+```
+## Use coroutine in lua
+```lua
+local co = coroutine.create(function() 
+    coroutine.yield(CS.UnityEngine.WaitForSeconds(3))
+end)
+coroutine.resume(co)
+```
+## Lua call csharp method with number parameter
+```lua
+-- Elapsed milliseconds about 0.0019
+-- 0B GC
+function LuaCallCS:TestNumber()
+    self.csharpTestCase:TestNumber(10);
+end
+```
+```csharp
+public void TestNumber(int num)
+{
+}
+```
+## Lua call csharp method with object parameter
+```lua
+-- Elapsed milliseconds about 0.0061
+-- 0B GC
+-- LuaCallCS.obj1 = CS.UnityEngine.GameObject() -- No issue.
+LuaCallCS.obj1 = {} -- Issue: lua table to csharp object will cause a lot of memory ??
+function LuaCallCS:TestObject()
+    self.csharpTestCase:TestObject(self.obj1)
+end
+```
+```csharp
+public void TestObject(object obj)
+{
+    // If obj is LuaTable 
+    using (LuaTable table = obj as LuaTable)
+    {
+    }
+}
+```
+## Lua call csharp method with out, ref parameters
+```lua
+-- Elapsed milliseconds about 0.0019
+-- 0B GC
+function LuaCallCS:TestOutRef()
+    local a, b
+    a, b = self.csharpTestCase:TestOutRef(a)
+    -- Log.Debug("a "..tostring(a).."b "..tostring(b))
+end
+```
+```csharp
+public void TestOutRef(ref int a, out int b)
+{
+    a = 1;
+    b = 2;
+}
+```
+
+## Lua call csharp overload method
+```lua
+-- Elapsed milliseconds about 0.0019
+-- 0B GC
+LuaCallCS.obj2 = {}
+function LuaCallCS:TestOverload()
+    self.csharpTestCase:OverloadA(1)
+    -- self.csharpTestCase:OverloadB(self.obj2)
+end
+```
+```csharp
+public void TestOverload() {}
+public void OverloadA(int a)
+{
+    // Debug.Log(string.Format("int a = {0}", a));
+}
+public void OverloadB(LuaTable a)
+{
+    // Debug.Log(string.Format("LuaTable a = {0}", a.ToString()));
+}
+```
+
+# Hotfix
+* 1. Add HOTFIX_ENABLE to *BuildSettings*
+* 2. Click XLua/Hotfix Inject In Editor
+```lua
+xlua.hotfix(CS.XLuaExamples.Hotfix, 'DoHotfix', function(self)
+    Log.Debug("Lua DoHotfix")
+end)
+```
+```csharp
+[XLua.Hotfix]
+public class Hotfix : XLuaTestCaseForLua<Hotfix>
+{
+    [ContextMenu("TestDoHotfix")]
+    public void DoHotfix()
+    {
+        Debug.Log("CSharp DoHotfix");
+    }
+}
+```
+
 # Some other features
 * Custom lua loader
-* Configure *CSharpCallLua* by list, like below:
+* Configure *CSharpCallLua*, *Hotfix* by list, like below:
 ```csharp
 [CSharpCallLua]
 public static List<Type> CSharpCallLua = new List<Type>()
@@ -254,6 +354,23 @@ public static List<Type> CSharpCallLua = new List<Type>()
     typeof(Action<bool>),
     typeof(UnityAction),
 };
+[Hotfix]
+public static List<Type> Hotfix = new List<Type>()
+{
+    typeof(HotFixSubClass),
+    typeof(GenericClass<>),
+};
 ```
-* Lua call csharp function with *out*, *ref*
-* Lua call csharp overload functions
+* Use *AdditionalProperties* for private fields of struct
+* Use *BlackList* for disable generating methods or fields
+* Use *CSObjectWrapEditor.GenPath* to configure generate path
+
+# Attentions
+* Classes called by lua, must use *ReflectionUse* or *LuaCallCSharp*
+* Pass lua table to csharp, should be careful with *LuaTable.Dispose()*
+
+# Advantages
+* Not necessary to generate wrappers when developping
+* Hotfix
+* Lazyload, only used class in memory
+* Value type no gc

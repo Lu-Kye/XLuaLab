@@ -132,5 +132,17 @@ namespace XLuaExamples
             if (UpdatingTest)
                 this.Test();
         }
+
+        [ContextMenu("DoUnsetup")]
+        protected void DoUnsetup()
+        {
+            this.Unsetup();
+        }
+
+        protected virtual void Unsetup()
+        {
+            _luaTable = null;
+            XLuaManager.Instance.ForceFullGc();
+        }
     }
 }

@@ -11,8 +11,8 @@ end
 
 -- Elapsed milliseconds about 0.0061
 -- 0B GC
-LuaCallCS.obj1 = CS.UnityEngine.GameObject()
--- LuaCallCS.obj1 = {} -- Issue: lua table to csharp object will cause a lot of memory ??
+-- LuaCallCS.obj1 = CS.UnityEngine.GameObject() -- No issue.
+LuaCallCS.obj1 = {} -- Issue: lua table to csharp object will cause a lot of memory ??
 function LuaCallCS:TestObject()
     self.csharpTestCase:TestObject(self.obj1)
 end

@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using XLua;
 
-[LuaCallCSharpAttribute]
+[LuaCallCSharp]
 public class XLuaManager : MonoBehaviour
 {
-    public static readonly LuaEnv LuaEnv = new LuaEnv();
     public static XLuaManager Instance { get; private set; }
+    XLuaManager() {}
+
+    public static readonly LuaEnv LuaEnv = new LuaEnv();
 
     float _lastGCTime = 0;
     // Lua gc interval (seconds)
@@ -103,4 +105,19 @@ public class XLuaManager : MonoBehaviour
         GUILayout.EndHorizontal();
     }
 
+    [ContextMenu("ForceFullGc")]
+    public void ForceFullGc()
+    {
+        System.GC.Collect();
+        System.GC.WaitForPendingFinalizers();
+
+        LuaEnv.Tick();
+        LuaEnv.FullGc();
+    }
+
+    [ContextMenu("MemorySnapshot")]
+    public void MemorySnapshot()
+    {
+        LuaEnv.DoString("Log.Debug(Memory.snapshot())");
+    }
 }

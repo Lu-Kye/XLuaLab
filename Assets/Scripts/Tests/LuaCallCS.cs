@@ -8,14 +8,21 @@ namespace XLuaExamples
     { 
         protected override string LuaFile { get { return "LuaCallCS"; } }
         
+        // 0B GC
         public void TestNumber(int num)
         {
         }
 
+        // If obj is LuaTable: 32B GC
         public void TestObject(object obj)
         {
+            // If obj is LuaTable 
+            using (LuaTable table = obj as LuaTable)
+            {
+            }
         }
 
+        // 0B GC
         public void TestOutRef(ref int a, out int b)
         {
             a = 1;
